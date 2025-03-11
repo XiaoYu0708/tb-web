@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>隨機選圖</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+  <style>
+    .navbar-brand {
+      font-weight: bold;
+      color: white !important;
+    }
+
+    .nav-link {
+      color: white !important;
+    }
+
+    .navbar-toggler {
+      color: white !important;
+      /* 確保漢堡選單圖示在所有主題中可見 */
+      border-color: white;
+      /* 可選：調整漢堡選單的邊框顏色 */
+    }
+
+
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: white;
+      color: black;
+    }
+
+    body {
+      color: black;
+    }
+
+    button {
+      color: black;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #121212;
+        color: white;
+      }
+    }
+
+
+    main {
+      flex-grow: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/">首頁</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse " id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="random_maps.html">隨機選圖</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="about.html">About</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <main class="container mt-5">
+    <div class="row justify-content-center">
+      <h1 class="text-center mb-4">隨機選圖</h1>
+      <div class="col-md-8">
+        <div class="card-body">
+          <div id="mapCategoryButtons" class="d-flex flex-wrap justify-content-center ">
+            <!-- Map category buttons will be added here -->
+          </div>
+          <div id="currentCategoryDisplay" class="text-center mt-2">
+            <!-- Current category will be displayed here -->
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="mapList" class="d-flex flex-wrap justify-content-center">
+            <!-- Map names will be listed here -->
+          </div>
+          <div id="mapCountDisplay" class="text-center mt-2">
+            <!-- Map count will be displayed here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const currentCategoryDisplay = document.getElementById('currentCategoryDisplay');
+    const mapList = document.getElementById('mapList');
+    const mapCountDisplay = document.getElementById('mapCountDisplay');
+    const mapCategoryButtons = document.getElementById('mapCategoryButtons');
+
+    const mapData = {
+      aMap: ["夜街霓虹", "甲板飛馳", "霓虹之夜", "森林伐木", "飛瀑穿行", "街區幹線", "褐谷車站", "火箭基地", "伐木場落日", "飛躍船塢", "崎嶇山路"],
+      bMap: ["卡門大橋", "摩天假日", "最高快感", "極速回環", "天文臺衝刺", "螺旋公路", "飛躍廠區", "霧裡卡門", "褐谷餘暉", "航太中心", "夜幕曼伽羅", "音浪海角"],
+      cMap: ["熱灣之眼", "海島一夏", "繽紛花海", "淺灘速降", "熱昂街道", "雨中城", "荒漠綠洲", "極樂海岸", "雨街夜鬥", "虹光之眼", "熱灣速度", "海角營地"],
+      sMap: ["海灣圓舞曲", "砂路狂飆", "福路碼頭"]
+    };
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+    const categories = ["allMaps", "cMap", "bMap", "aMap", "sMap"];
+    const categoryNames = {
+      allMaps: "全部",
+      cMap: "C圖",
+      bMap: "B圖",
+      aMap: "A圖",
+      sMap: "S圖",
+    };
+
+    let allMaps = [];
+    for (const key in mapData) {
+      allMaps.push(...mapData[key]);
+    }
+
+    function displayMaps(category) {
+      currentCategoryDisplay.textContent = `目前選擇：${categoryNames[category]}`;
+      mapList.innerHTML = '';
+      if (category === 'allMaps') {
+        shuffleArray(allMaps);
+        addMapButtons(allMaps);
+      } else if (mapData[category]) {
+        shuffleArray(mapData[category]);
+        addMapButtons(mapData[category])
+      }
+      updateMapCount();
+    }
+
+
+    function addMapButtons(maps) {
+      maps.forEach(mapName => {
+        const button = document.createElement('button');
+        button.classList.add('btn', 'btn-outline-primary', 'm-1', 'text-nowrap', 'text-center', 'd-flex', 'justify-content-center', 'align-items-center');
+        button.textContent = '按我';
+        button.dataset.mapName = mapName;
+        button.addEventListener('click', (event) => {
+          const mapName = event.target.dataset.mapName;
+          if (mapName && event.target.textContent === '按我') {
+            event.target.textContent = mapName;
+            event.target.style.backgroundColor = "#f9dadf";
+
+            event.target.disabled = true;
+            updateMapCount();
+          }
+
+        });
+        Object.assign(button.style, {
+          width: '10ch',
+          overflow: 'hidden',
+
+        });
+        mapList.appendChild(button);
+      });
+
+    }
+
+    function updateMapCount() {
+      let currentCategory = document.querySelector('#currentCategoryDisplay').textContent.split('：')[1];
+      let totalMaps;
+      if (currentCategory == '全部') {
+        totalMaps = allMaps.length
+      } else { totalMaps = mapData[Object.keys(categoryNames).find(key => categoryNames[key] === currentCategory)].length; }
+
+      let hiddenMaps = 0;
+      const mapButtons = mapList.querySelectorAll('button');
+      mapButtons.forEach(button => {
+        if (button.textContent !== '按我') {
+          hiddenMaps++;
+        }
+      });
+      const remainingMaps = totalMaps - hiddenMaps;
+      mapCountDisplay.textContent = `剩餘 ${remainingMaps} / ${totalMaps} 張圖`;
+    }
+    categories.forEach(category => {
+      const button = document.createElement('button');
+      button.classList.add('btn', 'btn-secondary', 'm-1');
+
+      button.textContent = categoryNames[category];
+      button.addEventListener('click', () => {
+        const mapButtons = mapList.querySelectorAll('button');
+        mapButtons.forEach(button => {
+          button.textContent = '按我';
+          button.style.backgroundColor = '';
+          button.disabled = false;
+        });
+        displayMaps(category);
+      });
+      mapCategoryButtons.appendChild(button);
+    });
+    currentCategoryDisplay.textContent = `目前選擇：${categoryNames['allMaps']}`;
+    displayMaps('allMaps');
+
+  </script>
+</body>
+<footer class="bg-dark text-white text-center py-3">
+  <style>
+    @media (prefers-color-scheme: dark) {
+      footer {
+        background-color: black;
+      }
+    }
+  </style>
+  <div class="container">
+    <p>&copy; 2025 TB-Web</p>
+    <p>本網站僅用於TB車隊內部使用</p>
+  </div>
+</footer>
+
+</html>
